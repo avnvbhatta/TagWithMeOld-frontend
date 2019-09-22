@@ -6,7 +6,6 @@ import axios from "axios"
 function SignUp(){
         return(
             <div>
-                <h1>Sign Up</h1>
                 <Formik
                     initialValues={{
                         first_name: '',
