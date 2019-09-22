@@ -7,12 +7,12 @@ import LogIn from "./Components/LogIn/LogIn"
 
 function App() {
   return (
-    <div>
+    <div className="jumbotron" style={{ "width":"50%"}}>
       <Header />
         <h1>TagWithMe</h1>
-        <h2>The beginning of something beautiful..</h2>
         <LogIn />
         <SignUp />
+        
       <Footer />
     </div>
   );
