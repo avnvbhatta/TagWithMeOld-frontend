@@ -2,9 +2,10 @@ import React from "react"
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from "axios"
+import Auth from "../Helpers/Auth"
 
-function LogIn(){
-
+function LogIn(props){
+    
     return(
         <div>
             <Formik
@@ -20,13 +21,32 @@ function LogIn(){
                         .required('Password is required')
                 })}
                 onSubmit={fields => {
+                    
                     axios.post('http://localhost:8848/user/login', fields)
                         .then((res) => {
                             console.log("RESPONSE RECEIVED: ", res);
+                            Auth.login();
+                            props.history.push("/home")
+
                         })
                         .catch((err) => {
                             console.log("AXIOS ERROR: ", err);
+                            props.history.push("/login")
+
                         })
+                    
+
+                    /*Logic for authentication
+                        //If token received, redirect to home, otherwise login.
+                        if(authenticated){
+                             props.history.push("/home")
+                        }
+                        else{
+                             props.history.push("/login")
+                        }
+
+                    */
+
                 }}
                 render={({ errors, status, touched }) => (
                     <Form>

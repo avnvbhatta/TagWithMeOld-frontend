@@ -2,43 +2,41 @@ import React from 'react';
 import './App.css';
 import Header from "./Components/Header"
 import Footer from './Components/Footer';
-import SignUp from "./Components/SignUp/SignUp"
-import LogIn from "./Components/LogIn/LogIn"
+import SignUp from "./Components/SignUp"
+import LogIn from "./Components/LogIn"
+import Home from "./Components/Home"
+import Messages from "./Components/Messages"
+import Profile from "./Components/Profile"
+
+import {BrowserRouter, Route, Switch} from "react-router-dom"
+import { ProtectedRoute } from "./Components/ProtectedRoute"
 
 class App extends React.Component {
   constructor(){
     super()
-    this.state = {
-      showLogin: true
-    }
-
-    this.changeView = this.changeView.bind(this)
   } 
-
-  changeView(event){
-    const {name} = event.target
-    this.setState({
-      showLogin: String([name]) === 'login' ? true : false
-    })
-  }
 
   render(){
     return (
-      <div id="container">
-        <div className="jumbotron">
-          <h1>TagWithMe</h1>
-          <div className="flex-item"> 
-            <button onClick={this.changeView} name="login" style={{"width": "100%"}}>Log In</button>
-            <button onClick={this.changeView} name="signup" style={{"width": "100%"}}>Sign Up</button>
-          </div>
-          <div>
-              {this.state.showLogin ? <LogIn /> : <SignUp />}
-          </div>
-
+      <BrowserRouter>
+        <div id="container">
+          <div className="jumbotron">
+            <h2>TagWithMe</h2>
+            <div>
+                <Switch>
+                  <Route path="/" exact component={LogIn}/>
+                  <Route path="/login" exact component={LogIn}/>
+                  <Route path="/signup" exact component={SignUp}/>
+                  <ProtectedRoute path="/home" exact component={Home}/>
+                  <ProtectedRoute path="/messages" exact component={Messages}/>
+                  <ProtectedRoute path="/profile" exact component={Profile}/>
+                  <Route path="*" component={() => "404 NOT FOUND"}/>
+                </Switch>
+            </div>
+          </div>  
         </div>
-        
-  
-      </div>
+      </BrowserRouter>
+      
     );
   }
   
