@@ -19,6 +19,7 @@ class App extends React.Component {
   render(){
     return (
       <BrowserRouter>
+      <Header />
         <div id="container">
           <div className="jumbotron">
             <h2>TagWithMe</h2>
