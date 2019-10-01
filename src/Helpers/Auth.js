@@ -1,12 +1,22 @@
+import axios from "axios";
 class Auth{
-    constructor(){
-        this.authenticated = false;
+    
+    authenticated = false;
+
+    async login(formData){
+        try{
+            let res = await axios.post('http://localhost:8848/user/login', formData);
+            if(res.status === 200){
+                this.authenticated = true;
+                console.log("status 200 from Auth.login()")
+            }
+        }catch(error){
+            console.log(error)
+        }
+
     }
 
-    login(cb){
-        this.authenticated = true;
-        //cb()
-    }
+   
 
     logout(cb){
         this.authenticated = false;

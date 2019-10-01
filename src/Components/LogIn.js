@@ -1,10 +1,14 @@
 import React from "react"
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from "axios"
 import Auth from "../Helpers/Auth"
 
 function LogIn(props){
+    
+    function signUp(){
+        props.history.push("/signup")
+    }
+
     
     return(
         <div>
@@ -20,33 +24,18 @@ function LogIn(props){
                     password: Yup.string()
                         .required('Password is required')
                 })}
-                onSubmit={fields => {
-                    
-                    axios.post('http://localhost:8848/user/login', fields)
-                        .then((res) => {
-                            console.log("RESPONSE RECEIVED: ", res);
-                            Auth.login();
-                            props.history.push("/home")
-
-                        })
-                        .catch((err) => {
-                            console.log("AXIOS ERROR: ", err);
-                            props.history.push("/login")
-
-                        })
-                    
+                onSubmit={async fields => {
+                    await Auth.login(fields);                  
 
                     /*Logic for authentication
                         //If token received, redirect to home, otherwise login.
-                        if(authenticated){
-                             props.history.push("/home")
-                        }
-                        else{
-                             props.history.push("/login")
-                        }
-
                     */
-
+                   if(Auth.isAuthenticated()){
+                        props.history.push("/home")
+                    }
+                    else{
+                        props.history.push("/login")
+                    }
                 }}
                 render={({ errors, status, touched }) => (
                     <Form>
@@ -62,6 +51,9 @@ function LogIn(props){
                         </div>
                         <div className="form-group">
                             <button type="submit" className="btn btn-primary" style={{"width":"100%"}}>Log In</button>
+                        </div>
+                        <div className="form-group">
+                            <button onClick={signUp} className="btn btn-primary" style={{"width":"100%"}}>New User? Sign Up!</button>
                         </div>
                     </Form>
                 )}

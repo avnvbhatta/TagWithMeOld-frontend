@@ -3,16 +3,16 @@ import "./Styles/styles.header.scss"
 
 function Header(){
     return (
-        <header class="site-header">
-  <a href="0" class="logo">Insert Logo Here... </a>
-  <nav class="site-nav">
+        <header className="site-header">
+  <a href="0" className="logo">Insert Logo Here... </a>
+  <nav className="site-nav">
     <ul>
-      <li class="active"><a href="0">Home</a></li>
+      <li className="active"><a href="0">Home</a></li>
       <li><a href="#">About</a></li>
     </ul>
   </nav>
   
-  <div class="site-settings">
+  <div className="site-settings">
     <ul>
         <li><a href="#">Settings</a></li>
         <li><a href="#">Sign Out</a></li>
