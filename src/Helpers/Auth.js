@@ -1,14 +1,18 @@
 import axios from "axios";
+import Cookie from "js-cookie"
+
 class Auth{
-    
-    authenticated = false;
+
+    constructor() {
+        this.authenticated = false;
+    }
 
     async login(formData){
         try{
             let res = await axios.post('http://localhost:8848/user/login', formData);
             if(res.status === 200){
                 this.authenticated = true;
-                console.log("status 200 from Auth.login()")
+                Cookie.set("token", res.data.success.token);
             }
         }catch(error){
             console.log(error)
@@ -16,15 +20,22 @@ class Auth{
 
     }
 
-   
-
     logout(cb){
         this.authenticated = false;
-        //cb()
+        Cookie.remove("token");
+
+        //Todo
+        /*
+        Make a request to server to invalidate the cookie.
+        */
     }
 
     isAuthenticated(){
         return this.authenticated;
+    }
+
+    getCookie(){
+        return Cookie.get("token") ? Cookie.get("token") : null;
     }
 
 }
