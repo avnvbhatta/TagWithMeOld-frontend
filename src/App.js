@@ -7,9 +7,11 @@ import LogIn from "./Components/LogIn"
 import Home from "./Components/Home"
 import Messages from "./Components/Messages"
 import Profile from "./Components/Profile"
-
+import SignUpConfirmation from "./Components/SignUpConfirmation"
 import {BrowserRouter, Route, Switch} from "react-router-dom"
 import { ProtectedRoute } from "./Components/ProtectedRoute"
+import "./styles.app.scss"
+
 
 class App extends React.Component {
   constructor(){
@@ -19,23 +21,16 @@ class App extends React.Component {
   render(){
     return (
       <BrowserRouter>
-      <Header />
-        <div id="container">
-          <div className="jumbotron">
-            <h2>TagWithMe</h2>
-            <div>
-                <Switch>
-                  <Route path="/" exact component={LogIn}/>
-                  <Route path="/login" exact component={LogIn}/>
-                  <Route path="/signup" exact component={SignUp}/>
-                  <ProtectedRoute path="/home" exact component={Home}/>
-                  <ProtectedRoute path="/messages" exact component={Messages}/>
-                  <ProtectedRoute path="/profile" exact component={Profile}/>
-                  <Route path="*" component={() => "404 NOT FOUND"}/>
-                </Switch>
-            </div>
-          </div>  
-        </div>
+            <Switch>
+              <Route path="/" exact component={LogIn}/>
+              <Route path="/login" exact component={LogIn}/>
+              <Route path="/signup" exact component={SignUp}/>
+              <ProtectedRoute path="/home" exact component={Home}/>
+              <ProtectedRoute path="/messages" exact component={Messages}/>
+              <ProtectedRoute path="/profile" exact component={Profile}/>
+              <Route path="/confirm" exact component={SignUpConfirmation}/>
+              <Route path="*" component={() => "404 NOT FOUND"}/>
+            </Switch>
       </BrowserRouter>
       
     );
