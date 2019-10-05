@@ -12,27 +12,37 @@ import {BrowserRouter, Route, Switch} from "react-router-dom"
 import { ProtectedRoute } from "./Components/ProtectedRoute"
 import "./styles.app.scss"
 
-
 class App extends React.Component {
-  constructor(){
-    super()
+  constructor(props){
+    super(props);
+    this.state = {
+      header: <Header />,
+      footer: <Footer />
+    }
   } 
-
+  
   render(){
     return (
-      <BrowserRouter>
-            <Switch>
-              <Route path="/" exact component={LogIn}/>
-              <Route path="/login" exact component={LogIn}/>
-              <Route path="/signup" exact component={SignUp}/>
-              <ProtectedRoute path="/home" exact component={Home}/>
-              <ProtectedRoute path="/messages" exact component={Messages}/>
-              <ProtectedRoute path="/profile" exact component={Profile}/>
-              <Route path="/confirm" exact component={SignUpConfirmation}/>
-              <Route path="*" component={() => "404 NOT FOUND"}/>
-            </Switch>
-      </BrowserRouter>
-      
+      <div>
+        <BrowserRouter>
+          <div className="app-layout">
+            <Header />
+            <div className="app-content">
+              <Switch>
+                <Route path="/" exact component={LogIn}/>
+                <Route path="/login" exact component={LogIn}/>
+                <Route path="/signup" exact component={SignUp}/>
+                <ProtectedRoute path="/home" exact component={Home}/>
+                <ProtectedRoute path="/messages" exact component={Messages}/>
+                <ProtectedRoute path="/profile" exact component={Profile}/>
+                <Route path="/confirm" exact component={SignUpConfirmation}/>
+                <Route path="*" component={() => "404 NOT FOUND"}/>
+              </Switch>
+            </div>
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </div>     
     );
   }
   
