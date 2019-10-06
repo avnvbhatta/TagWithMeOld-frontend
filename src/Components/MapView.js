@@ -4,6 +4,8 @@ import React, { Component } from "react";
 import MapGL,  { Popup, Marker }  from "react-map-gl";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
+import axios from "axios";
+import "./Styles/styles.mapview.css"
 
 const mapStyle = {
   height: '100vh',
@@ -13,15 +15,25 @@ const mapStyle = {
   marginRight: '10%'
 }
 
+const eventDetailStyle = {
+  height: '10%',
+  display: 'block',
+  width: '10%',
+  marginLeft: '35%',
+  marginRight: '35%'
+}
+
 const popupStyle = {
   background: '#'
 }
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+const TICKETMASTER_TOKEN = process.env.REACT_APP_TICKETMASTER_API_KEY;
 
 class MapView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      minZoom: 11,
       viewport: {
         latitude: 37.7577,
         longitude: -122.4376,
@@ -29,25 +41,25 @@ class MapView extends React.Component {
       },
       events: {
         event1: {
-          id: 1,
+          id: 'k7vGF4SEuohYL',
           name: 'Event 1',
           latitude: 37.7567,
           longitude: -122.4456
         }, 
         event2: {
-          id: 2,
+          id: '1ApZA_3GkdAvSg0',
           name: 'Event 2',
           latitude: 37.7577,
           longitude: -122.4446
         }, 
         event3: {
-          id: 3,
+          id: 'vvG1YZ4Ef8DM63',
           name: 'Event 3',
           latitude: 37.7652,
           longitude: -122.4356
         }, 
         event4: {
-          id: 4,
+          id: 'G5ezZ4EQXF3ZT',
           name: 'Event 4',
           latitude: 37.7557,
           longitude: -122.4256
@@ -55,26 +67,51 @@ class MapView extends React.Component {
       },
       searchResultLayer: null,
       showPopup: true,
-      event: "My Event"
+      showDetail: false,
+      eventDetails: <div className="group"> </div>
     };
   }
   
   mapRef = React.createRef();
 
   showDetails = (eventID) => {
-    console.log(eventID)
+    axios.get('https://app.ticketmaster.com/discovery/v2/events/' + eventID + '?apikey='+ TICKETMASTER_TOKEN + '&locale=*')
+    .then((res) => {
+        console.log("RESPONSE RECEIVED: ", res);
+        this.setState({
+          showDetail: true
+        });
+        // data._embedded.venues[0].name
+        // data.name
+        // data.images[1].url
+        this.state.eventDetails = <div className="group">
+          <ul className="events">
+          <li> <strong> Event </strong></li>
+           <li> <span>{res.data.name}</span> </li>
+          <li> <span>{res.data._embedded.venues[0].name}</span> </li>
+          <li> <img src = {res.data.images[1].url}></img> </li>
+          </ul>
+        </div> 
+    })
+    .catch((err) => {
+        console.log("AXIOS ERROR: ", err);
+    })
   }
 
-  markerClicked = () => {
+  markerHover = () => {
     this.setState({
-      event: "EVENT!!"
+      showDetail: true
     });
   }
 
   markerLeft = () => {
     this.setState({
-      event: "My Event"
+      showDetail: false
     });
+  }
+
+  handleClick = (e) => {
+    console.log()
   }
 
   createEvents = () => {
@@ -82,11 +119,12 @@ class MapView extends React.Component {
     let event_list = this.state.events
     for (let x in event_list) {
       items.push(<Popup 
+        key = {event_list[x].id}
         latitude={event_list[x].latitude}
         longitude={event_list[x].longitude}   
         anchor = "top"
         style = {popupStyle}>
-        <div onMouseOver={this.markerClicked} onMouseLeave={this.markerLeft} onClick={() => this.showDetails(event_list[x].name)}> H </div></Popup>)
+        <div id={event_list[x].id} onMouseOver={() => this.showDetails(event_list[x].id)} onMouseLeave={this.markerLeft}> H </div></Popup>)
     } 
       return items
   }
@@ -130,7 +168,7 @@ class MapView extends React.Component {
           {...viewport}
           width="100%"
           height="100%"
-          minZoom = "8"
+          minZoom = {this.state.minZoom}
           onViewportChange={this.handleViewportChange}
           mapboxApiAccessToken={MAPBOX_TOKEN}
         >
@@ -143,6 +181,7 @@ class MapView extends React.Component {
           />
           <DeckGL {...viewport} layers={[searchResultLayer]} />
          {this.createEvents()}
+         {this.state.showDetail && this.state.eventDetails}
         </MapGL>
       </div>
     );
