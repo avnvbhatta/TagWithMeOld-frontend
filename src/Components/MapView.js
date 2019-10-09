@@ -5,6 +5,7 @@ import MapGL,  { Popup, Marker }  from "react-map-gl";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
 import axios from "axios";
+import Event from "../Helpers/Event"
 import "./Styles/styles.mapview.css"
 
 const mapStyle = {
@@ -26,76 +27,68 @@ const eventDetailStyle = {
 const popupStyle = {
   background: '#'
 }
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_TOKEN = "pk.eyJ1IjoiYXZudmJoYXR0YSIsImEiOiJjazE2cHkza3MwMTlmM2hvY2k0dGZoaXgzIn0.T_Vdh6BWjH_Ie3HUrTI8sQ";
 const TICKETMASTER_TOKEN = process.env.REACT_APP_TICKETMASTER_API_KEY;
 
 class MapView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      userLatLong: "",
       minZoom: 11,
       viewport: {
         latitude: 37.7577,
         longitude: -122.4376,
         zoom: 11,
       },
-      events: {
-        event1: {
-          id: 'k7vGF4SEuohYL',
-          name: 'Event 1',
-          latitude: 37.7567,
-          longitude: -122.4456
-        }, 
-        event2: {
-          id: '1ApZA_3GkdAvSg0',
-          name: 'Event 2',
-          latitude: 37.7577,
-          longitude: -122.4446
-        }, 
-        event3: {
-          id: 'vvG1YZ4Ef8DM63',
-          name: 'Event 3',
-          latitude: 37.7652,
-          longitude: -122.4356
-        }, 
-        event4: {
-          id: 'G5ezZ4EQXF3ZT',
-          name: 'Event 4',
-          latitude: 37.7557,
-          longitude: -122.4256
-        }
-      },
+      events: [],
       searchResultLayer: null,
       showPopup: true,
       showDetail: false,
       eventDetails: <div className="group"> </div>
     };
+    this.getLocation =  this.getLocation.bind(this)
+    this.getEvents = this.getEvents.bind(this)
   }
   
   mapRef = React.createRef();
 
-  showDetails = (eventID) => {
-    axios.get('https://app.ticketmaster.com/discovery/v2/events/' + eventID + '?apikey='+ TICKETMASTER_TOKEN + '&locale=*')
-    .then((res) => {
-        console.log("RESPONSE RECEIVED: ", res);
+  componentDidMount(){
+    this.getLocation();
+    this.getEvents();
+    
+
+  }
+
+  getLocation(){
+    navigator.geolocation.getCurrentPosition((position) => {
         this.setState({
-          showDetail: true
-        });
-        // data._embedded.venues[0].name
-        // data.name
-        // data.images[1].url
-        this.state.eventDetails = <div className="group">
+            userLatLong: position.coords.latitude+","+position.coords.longitude
+        })
+    });
+  }
+
+  async getEvents(){
+    let event = new Event();
+    let eventList = []
+    let res = await event.getEvent(this.state.userLatLong)
+    this.setState({
+      events: res
+    })
+  }
+
+
+
+  
+  showDetails = (event) => {
+    this.state.eventDetails = <div className="group">
           <ul className="events">
           <li> <strong> Event </strong></li>
-           <li> <span>{res.data.name}</span> </li>
-          <li> <span>{res.data._embedded.venues[0].name}</span> </li>
-          <li> <img src = {res.data.images[1].url}></img> </li>
+           <li> <span>{event.name}</span> </li>
+          <li> <span>{event._embedded.venues[0].name}</span> </li>
+          <li> <img src = {event.images[1].url}></img> </li>
           </ul>
         </div> 
-    })
-    .catch((err) => {
-        console.log("AXIOS ERROR: ", err);
-    })
   }
 
   markerHover = () => {
@@ -114,17 +107,22 @@ class MapView extends React.Component {
     console.log()
   }
 
-  createEvents = () => {
+  createEvents(){
+    console.log('here')
     const items = []
     let event_list = this.state.events
+    console.log(event_list)
     for (let x in event_list) {
+      console.log(x)
+      
       items.push(<Popup 
         key = {event_list[x].id}
-        latitude={event_list[x].latitude}
-        longitude={event_list[x].longitude}   
+        latitude={parseInt(event_list[x]._embedded.venues[0].location.latitude)}
+        longitude={parseInt(event_list[x]._embedded.venues[0].location.longitude)}   
         anchor = "top"
         style = {popupStyle}>
-        <div id={event_list[x].id} onMouseOver={() => this.showDetails(event_list[x].id)} onMouseLeave={this.markerLeft}> H </div></Popup>)
+        <div id={event_list[x].id} onMouseOver={() => this.showDetails(event_list[x])} onMouseLeave={this.markerLeft}> H </div></Popup>)
+        
     } 
       return items
   }
