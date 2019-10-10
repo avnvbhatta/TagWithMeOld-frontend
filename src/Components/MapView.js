@@ -1,130 +1,46 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import React, { Component } from "react";
-import MapGL,  { Popup, Marker }  from "react-map-gl";
+import ReactMapGL, { Popup, Marker } from "react-map-gl";
+import Event from "../Helpers/Event";
+import "./Styles/styles.mapview.css";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
-import axios from "axios";
-import Event from "../Helpers/Event"
-import "./Styles/styles.mapview.css"
 
-const mapStyle = {
-  height: '100vh',
-  paddingBottom:'10%',
-  paddingTop: '2%',
-  marginLeft: '10%',
-  marginRight: '10%'
-}
-
-const eventDetailStyle = {
-  height: '10%',
-  display: 'block',
-  width: '10%',
-  marginLeft: '35%',
-  marginRight: '35%'
-}
-
-const popupStyle = {
-  background: '#'
-}
-const MAPBOX_TOKEN = "pk.eyJ1IjoiYXZudmJoYXR0YSIsImEiOiJjazE2cHkza3MwMTlmM2hvY2k0dGZoaXgzIn0.T_Vdh6BWjH_Ie3HUrTI8sQ";
-const TICKETMASTER_TOKEN = process.env.REACT_APP_TICKETMASTER_API_KEY;
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 class MapView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userLatLong: "",
-      minZoom: 11,
       viewport: {
+        width: "100%",
+        height: "85vh",
         latitude: 37.7577,
         longitude: -122.4376,
-        zoom: 11,
+        zoom: 11
       },
+      userLocation: {},
       events: [],
-      searchResultLayer: null,
-      showPopup: true,
-      showDetail: false,
-      eventDetails: <div className="group"> </div>
+      selectedEvent: null,
+      searchResultLayer: null
     };
-    this.getLocation =  this.getLocation.bind(this)
-    this.getEvents = this.getEvents.bind(this)
-  }
-  
-  mapRef = React.createRef();
 
-  componentDidMount(){
-    this.getLocation();
-    this.getEvents();
-    
-
+    this.setUserLocation = this.setUserLocation.bind(this);
   }
 
-  getLocation(){
-    navigator.geolocation.getCurrentPosition((position) => {
-        this.setState({
-            userLatLong: position.coords.latitude+","+position.coords.longitude
-        })
-    });
+  async componentDidMount() {
+    await this.setUserLocation();
+    await this.getEvents();
   }
 
-  async getEvents(){
+  async getEvents() {
     let event = new Event();
-    let eventList = []
-    let res = await event.getEvent(this.state.userLatLong)
+    let event_list = await event.getEvent(this.state.userLocation);
     this.setState({
-      events: res
-    })
-  }
-
-
-
-  
-  showDetails = (event) => {
-    this.state.eventDetails = <div className="group">
-          <ul className="events">
-          <li> <strong> Event </strong></li>
-           <li> <span>{event.name}</span> </li>
-          <li> <span>{event._embedded.venues[0].name}</span> </li>
-          <li> <img src = {event.images[1].url}></img> </li>
-          </ul>
-        </div> 
-  }
-
-  markerHover = () => {
-    this.setState({
-      showDetail: true
+      events: event_list,
+      dataLoaded: true
     });
-  }
-
-  markerLeft = () => {
-    this.setState({
-      showDetail: false
-    });
-  }
-
-  handleClick = (e) => {
-    console.log()
-  }
-
-  createEvents(){
-    console.log('here')
-    const items = []
-    let event_list = this.state.events
-    console.log(event_list)
-    for (let x in event_list) {
-      console.log(x)
-      
-      items.push(<Popup 
-        key = {event_list[x].id}
-        latitude={parseInt(event_list[x]._embedded.venues[0].location.latitude)}
-        longitude={parseInt(event_list[x]._embedded.venues[0].location.longitude)}   
-        anchor = "top"
-        style = {popupStyle}>
-        <div id={event_list[x].id} onMouseOver={() => this.showDetails(event_list[x])} onMouseLeave={this.markerLeft}> H </div></Popup>)
-        
-    } 
-      return items
   }
 
   handleViewportChange = viewport => {
@@ -133,6 +49,66 @@ class MapView extends React.Component {
     });
   };
 
+  getPosition() {
+    return new Promise((res, rej) => {
+      navigator.geolocation.getCurrentPosition(res, rej);
+    });
+  }
+
+  async setUserLocation() {
+    var position = await this.getPosition(); // wait for getPosition to complete
+    let setUserLocation = {
+      lat: position.coords.latitude,
+      long: position.coords.longitude
+    };
+    let newViewport = {
+      width: "100%",
+      height: "85vh",
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      zoom: 10
+    };
+    this.setState({
+      viewport: newViewport,
+      userLocation: setUserLocation
+    });
+  }
+
+  setHoveredEvent = object => {
+    this.setState({
+      selectedEvent: object
+    });
+  };
+
+  closePopup = () => {
+    this.setState({
+      selectedEvent: null
+    });
+  };
+
+  mapRef = React.createRef();
+
+  loadEventMarkers = () => {
+    return this.state.events.map(event => {
+      return (
+        <Marker
+          key={event.id}
+          latitude={parseFloat(event._embedded.venues[0].location.latitude)}
+          longitude={parseFloat(event._embedded.venues[0].location.longitude)}
+        >
+          <img
+            className="icon"
+            onMouseOver={() => {
+              this.setHoveredEvent(event);
+            }}
+            onMouseLeave={this.closePopup}
+            src="/Images/icon-sport.svg"
+            alt=""
+          />
+        </Marker>
+      );
+    });
+  };
   // if you are happy with Geocoder default settings, you can just use handleViewportChange directly
   handleGeocoderViewportChange = viewport => {
     const geocoderDefaultOverrides = { transitionDuration: 1000 };
@@ -157,18 +133,14 @@ class MapView extends React.Component {
   };
 
   render() {
-    const { viewport, searchResultLayer } = this.state;
-
     return (
-      <div style={mapStyle}>
-        <MapGL
+      <div className="mapStyle">
+        <img className="icon" onClick={this.setUserLocation} src="/Images/icon-locate.svg"></img>
+        <ReactMapGL
           ref={this.mapRef}
-          {...viewport}
-          width="100%"
-          height="100%"
-          minZoom = {this.state.minZoom}
-          onViewportChange={this.handleViewportChange}
+          {...this.state.viewport}
           mapboxApiAccessToken={MAPBOX_TOKEN}
+          onViewportChange={this.handleViewportChange}
         >
           <Geocoder
             mapRef={this.mapRef}
@@ -177,10 +149,36 @@ class MapView extends React.Component {
             mapboxApiAccessToken={MAPBOX_TOKEN}
             position="top-left"
           />
-          <DeckGL {...viewport} layers={[searchResultLayer]} />
-         {this.createEvents()}
-         {this.state.showDetail && this.state.eventDetails}
-        </MapGL>
+          <DeckGL {...this.state.viewport} layers={[this.state.searchResultLayer]} />
+          {Object.keys(this.state.userLocation).length !== 0 ? (
+            <Marker
+              latitude={this.state.userLocation.lat}
+              longitude={this.state.userLocation.long}
+            >
+              <img className="icon" src="/Images/user-location.svg"></img>
+            </Marker>
+          ) : (
+            <div>Empty</div>
+          )}
+          {this.loadEventMarkers()}
+          {this.state.selectedEvent !== null ? (
+            <Popup
+              latitude={parseFloat(this.state.selectedEvent._embedded.venues[0].location.latitude)}
+              longitude={parseFloat(this.state.selectedEvent._embedded.venues[0].location.longitude)}
+            >
+              <div
+                style={{ width: "200px", height: "125px", textAlign: "center" }}
+              >
+                <img
+                  className="eventImage"
+                  src={this.state.selectedEvent.images[3].url}
+                  alt=""
+                />
+                <p>{this.state.selectedEvent.name}</p>
+              </div>
+            </Popup>
+          ) : null}
+        </ReactMapGL>
       </div>
     );
   }

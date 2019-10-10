@@ -22,3 +22,16 @@ ul.events li img {
 	padding: 20px;
 }
 
+.mapStyle{
+	padding: 2em
+}
+
+.icon{
+	width: 30x;
+	height: 30px
+}
+
+.eventImage{
+	width: 150px;
+	height: 100px;
+}
