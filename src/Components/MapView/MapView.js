@@ -2,8 +2,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import React, { Component } from "react";
 import ReactMapGL, { Popup, Marker } from "react-map-gl";
-import Event from "../Helpers/Event";
-import "./Styles/styles.mapview.css";
+import Event from "Helpers/Event";
+import "Components/MapView/styles.mapview.css";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
 

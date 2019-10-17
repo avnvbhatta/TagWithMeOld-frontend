@@ -1,8 +1,8 @@
 import React from "react"
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Auth from "../Helpers/Auth"
-import "./Styles/styles.login.scss"
+import Auth from "Helpers/Auth"
+import "Components/LogIn/styles.login.scss"
 
 function LogIn(props){
     

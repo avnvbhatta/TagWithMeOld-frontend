@@ -1,6 +1,6 @@
 import React from "react"
 import {Link, Redirect} from "react-router-dom"
-import Auth from "../Helpers/Auth"
+import Auth from "Helpers/Auth"
 class Home extends React.Component{
     constructor(props){
         super(props)

@@ -1,25 +1,20 @@
 import React from 'react';
-import './App.css';
-import Header from "./Components/Header"
-import Footer from './Components/Footer';
-import SignUp from "./Components/SignUp"
-import LogIn from "./Components/LogIn"
-import Home from "./Components/Home"
-import MapView from "./Components/MapView"
-import Messages from "./Components/Messages"
-import Profile from "./Components/Profile"
-import SignUpConfirmation from "./Components/SignUpConfirmation"
+import Header from "Components/Header/Header"
+import Footer from "Components/Footer/Footer";
+import SignUp from "Components/SignUp/SignUp"
+import LogIn from "Components/LogIn/LogIn"
+import Home from "Components/Home/Home"
+import MapView from "Components/MapView/MapView"
+import Messages from "Components/Messages/Messages"
+import Profile from "Components/Profile/Profile"
+import SignUpConfirmation from "Components/SignUpConfirmation/SignUpConfirmation"
 import {BrowserRouter, Route, Switch} from "react-router-dom"
-import { ProtectedRoute } from "./Components/ProtectedRoute"
-import "./styles.app.scss"
+import { ProtectedRoute } from "Components/ProtectedRoute/ProtectedRoute"
+import "styles.app.scss"
 
 class App extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      header: <Header />,
-      footer: <Footer />
-    }
   } 
   
   render(){
