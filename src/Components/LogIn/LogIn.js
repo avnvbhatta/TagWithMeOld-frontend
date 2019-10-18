@@ -35,7 +35,7 @@ function LogIn(props){
                         /*Logic for authentication
                             //If token received, redirect to home, otherwise login.
                         */
-                    if(Auth.isAuthenticated()){
+                        if(Auth.isAuthenticated()){
                             props.history.push("/home")
                         }
                         else{

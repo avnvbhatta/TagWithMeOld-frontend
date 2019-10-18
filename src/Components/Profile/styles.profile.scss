@@ -1,0 +1,67 @@
+.profile-container{
+
+    div{
+        padding: 0.5em;
+    }
+
+    .profile-main{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 65vh;
+        width:100%;
+    
+        .profile-user-image img{
+            width:  150px;
+            height: 150px;
+            border-radius: 100%;
+            border: 2px solid white;
+        }
+    
+        .profile-user-location{
+            display: flex;
+            flex-direction: row;
+            img{
+                width:  15px;
+                height: 30px;
+            }
+        }
+
+        .profile-user-social{
+            display: flex;
+            flex-direction: row;
+
+            img{
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        .profile-user-message button{
+            background: #1da1f2;
+            color: white;
+            height: 50px;
+            width: 150px;
+            border-radius: 100px;
+            transition: all 0.2s ease-in;
+            border: 0px;
+
+            &:hover{
+                background: #45619d;
+                
+            }
+        }
+
+
+    }
+}
+
+.separator{
+    width: 100%;
+    height: 2vh;
+    background: gainsboro
+}
+
+
+
